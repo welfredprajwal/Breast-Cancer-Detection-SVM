@@ -1,87 +1,84 @@
 # Breast-Cancer-Detection-SVM
-This project utilizes the Support Vector Machine (SVM) algorithm for breast cancer detection. It analyzes medical data to classify tumors as benign or malignant based on key features. By leveraging SVM's ability to handle high-dimensional data, the model enhances diagnostic accuracy, aiding early detection and improving patient outcomes.(The SVM algorithm creates a hyperplane to segregate n-dimensional space into classes and identify the correct category of new data points. The extreme cases that help create the hyperplane are called support vectors, hence the name Support Vector Machine.)This project uses Support Vector Machine (SVM) to classify breast tumors as benign or malignant using the Breast Cancer Wisconsin (Diagnostic) dataset. SVM is effective for binary classification, especially in high-dimensional feature spaces.
 
-📂 Dataset
+Overview
 
-Features: 30 numeric columns describing tumor characteristics (mean, standard error, worst)
+This project predicts whether a breast tumor is malignant or benign using a Support Vector Machine (SVM) classifier. SVM is chosen for its ability to handle high-dimensional data and achieve strong classification performance.
 
-Target: diagnosis → M (Malignant), B (Benign)
+The dataset consists of features extracted from digitized images of breast mass samples, capturing shape, size, and texture characteristics of cell nuclei.
 
-Samples: 569
+# Dataset
 
-Columns include:
-radius_mean, texture_mean, perimeter_mean, area_mean, smoothness_mean, compactness_mean, concavity_mean, concave points_mean, symmetry_mean, fractal_dimension_mean, radius_se, ... , fractal_dimension_worst
+| Feature                   | Description                                                 |
+| ------------------------- | ----------------------------------------------------------- |
+| id                        | Unique identifier for each sample (not used for prediction) |
+| diagnosis                 | Target variable: M = Malignant, B = Benign                  |
+| radius\_mean              | Mean of distances from center to points on the perimeter    |
+| texture\_mean             | Standard deviation of gray-scale values                     |
+| perimeter\_mean           | Mean perimeter of the tumor                                 |
+| area\_mean                | Mean area of the tumor                                      |
+| smoothness\_mean          | Mean of local variation in radius lengths                   |
+| compactness\_mean         | $\frac{perimeter^2}{area} - 1$                              |
+| concavity\_mean           | Mean severity of concave portions of the contour            |
+| concave points\_mean      | Mean number of concave points                               |
+| symmetry\_mean            | Mean symmetry of the tumor                                  |
+| fractal\_dimension\_mean  | Mean “coastline approximation” – measures complexity        |
+| radius\_se                | Standard error of radius                                    |
+| texture\_se               | Standard error of texture                                   |
+| perimeter\_se             | Standard error of perimeter                                 |
+| area\_se                  | Standard error of area                                      |
+| smoothness\_se            | Standard error of smoothness                                |
+| compactness\_se           | Standard error of compactness                               |
+| concavity\_se             | Standard error of concavity                                 |
+| concave points\_se        | Standard error of concave points                            |
+| symmetry\_se              | Standard error of symmetry                                  |
+| fractal\_dimension\_se    | Standard error of fractal dimension                         |
+| radius\_worst             | Largest (worst) radius                                      |
+| texture\_worst            | Largest texture value                                       |
+| perimeter\_worst          | Largest perimeter                                           |
+| area\_worst               | Largest area                                                |
+| smoothness\_worst         | Largest smoothness value                                    |
+| compactness\_worst        | Largest compactness value                                   |
+| concavity\_worst          | Largest concavity value                                     |
+| concave points\_worst     | Largest number of concave points                            |
+| symmetry\_worst           | Largest symmetry value                                      |
+| fractal\_dimension\_worst | Largest fractal dimension value                             |
 
-⚙️ Python Implementation
-# Breast Cancer Detection using SVM
+# Why SVM?
 
-import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-import seaborn as sns
-import matplotlib.pyplot as plt
+Handles high-dimensional data efficiently.
+Finds the optimal hyperplane that separates malignant and benign tumors.
+Effective for binary classification problems.
 
-# Load dataset
-df = pd.read_csv("breast_cancer_data.csv")  # Replace with your CSV file path
+# Workflow
 
-# Encode target column (M=1, B=0)
-le = LabelEncoder()
-df['diagnosis'] = le.fit_transform(df['diagnosis'])
+1. Data Preprocessing
 
-# Features and target
-X = df.drop(['id', 'diagnosis'], axis=1)
-y = df['diagnosis']
+    Drop id column
+    Encode diagnosis (M → 1, B → 0)
+    Handle missing values (if any)
+    Scale features using StandardScaler
 
-# Split into train and test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+2. Exploratory Data Analysis (EDA)
 
-# Feature scaling
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+    Visualize distributions of features
+    Analyze correlations to reduce redundant features
 
-# Train SVM with GridSearch for best parameters
-param_grid = {
-    'C': [0.1, 1, 10],
-    'gamma': [0.001, 0.01, 0.1],
-    'kernel': ['linear', 'rbf', 'poly']
-}
+3. SVM Model Training
 
-grid = GridSearchCV(SVC(), param_grid, cv=5)
-grid.fit(X_train, y_train)
+    Split dataset into training and testing sets
+    Train SVM classifier with kernel selection (linear, RBF, or polynomial)
+    Tune hyperparameters using GridSearchCV
 
-# Best parameters
-print("Best Parameters:", grid.best_params_)
+4. Model Evaluation
 
-# Predictions
-y_pred = grid.predict(X_test)
+    Evaluate using accuracy, precision, recall, F1-score, and ROC-AUC
+    Analyze confusion matrix to assess false positives/negatives
 
-# Evaluation
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("\nClassification Report:\n", classification_report(y_test, y_pred))
+5. Prediction
+    Predict tumor malignancy for new samples based on features.
 
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=['Benign','Malignant'], yticklabels=['Benign','Malignant'])
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.title("Confusion Matrix")
-plt.show()
+# Results
 
-✅ Key Points
-
-Label Encoding: Converts M and B to numeric labels (1 & 0).
-
-Feature Scaling: Standardization is critical for SVM performance.
-
-Hyperparameter Tuning: C (regularization) and gamma (kernel coefficient) are tuned using GridSearchCV.
-
-Evaluation: Accuracy, precision, recall, F1-score, and confusion matrix.
-
-📊 Expected Results
-
-Accuracy: ~96–98%
+Accuracy: 96–98%
 
 High precision and recall for detecting malignant tumors, which is important for minimizing false negatives.
