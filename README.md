@@ -75,6 +75,7 @@ Effective for binary classification problems.
     Analyze confusion matrix to assess false positives/negatives
 
 5. Prediction
+
     Predict tumor malignancy for new samples based on features.
 
 # Results
